@@ -91,18 +91,26 @@ class BaremetalClient(base.BaremetalClient):
         return self._show_request('nodes', uuid)
 
     @base.handle_errors
-    def show_node_by_instance_uuid(self, instance_uuid):
+    def show_node_by_instance_uuid(self, instance_uuid, api_version=None):
         """Gets a node associated with given instance uuid.
 
         :param instance_uuid: Unique identifier of the instance in UUID format.
+        :param api_version: Ironic API version to use.
         :return: Serialized node as a dictionary.
 
         """
         uri = '/nodes/detail?instance_uuid=%s' % instance_uuid
 
+        extra_headers = False
+        headers = None
+        if api_version is not None:
+            extra_headers = True
+            headers = {'x-openstack-ironic-api-version': api_version}
+
         return self._show_request('nodes',
                                   uuid=None,
-                                  uri=uri)
+                                  uri=uri, headers=headers,
+                                  extra_headers=extra_headers)
 
     @base.handle_errors
     def show_chassis(self, uuid):
